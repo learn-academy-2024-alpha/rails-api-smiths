@@ -19,6 +19,7 @@ class AnimalSightingsController < ApplicationController
 
   def update
     animal_sighting = AnimalSighting.find(params[:id])
+    animal_sighting.update!(animal_sighting_attributes)
     animal_sighting.update(animal_sighting_params)
     render json: animal_sighting
   end
