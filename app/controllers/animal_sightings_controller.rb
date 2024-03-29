@@ -1,12 +1,19 @@
 class AnimalSightingsController < ApplicationController
 
   def index
-    animal_sightings = AnimalSighting.all
+    # animal_sightings = AnimalSighting.all
+    # sightings = Sighting.where(date: params[:start_date]..params[:end_date])
+    animal_sightings = AnimalSighting.where(date: params[:start_date]..params[:end_date])
     render json: animal_sightings
   end
 
   def create
     animal_sighting = AnimalSighting.create(animal_sighting_params)
+    render json: animal_sighting
+  end
+
+  def show
+    animal_sighting = AnimalSighting.find(params[:id])
     render json: animal_sighting
   end
 

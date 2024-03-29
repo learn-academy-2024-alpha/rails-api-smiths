@@ -83,26 +83,36 @@ Branch: sighting-crud-actions
 
 Acceptance Criteria
 
-rails g resource AnimalSightings latitude:string longitude:string date:string 
-
 Create a resource for animal sightings with the following information: latitude, longitude, date
 Hint: An animal has_many sightings (rails g resource Sighting animal_id:integer ...)
 Hint: Date is written in Active Record as yyyy-mm-dd (“2022-07-28")
-
 Can create a new animal sighting in the database
-
 Can update an existing animal sighting in the database
-
 Can remove an animal sighting in the database
+
 Story 3: In order to see the wildlife sightings, as a user of the API, I need to run reports on animal sightings.
 
 Branch: animal-sightings-reports
 
 Acceptance Criteria
 
-Can see one animal with all its associated sightings
+Can see one animal with all its associated sightings🐻
+(added sightings to db)
+http://localhost:3000/animals
+{
+"latitude": "48843",
+"longitude": "39208",
+"date": "3-27-2024",
+"animal_id": 2
+}
+(added .includes to animal controller show method)
+def show
+animal = Animal.find(params[:id])
+render json: animal, include: :animal_sightings
+end
+http://localhost:3000/animals/2
 Hint: Checkout this example on how to include associated records
-Can see all the all sightings during a given time period
+Can see all the animal sightings during a given time period
 Hint: Your controller can use a range to look like this:
 class SightingsController < ApplicationController
 def index
@@ -113,6 +123,37 @@ end
 Hint: Be sure to add the start_date and end_date to what is permitted in your strong parameters method
 Hint: Utilize the params section in Postman to ease the developer experience
 Hint: Routes with params
+(added a date outside the boundary)
+http://localhost:3000/animal_sightings
+{
+"latitude": "48843",
+"longitude": "39208",
+"date": "1-27-2025",
+"animal_id": 2
+}
+(updated animal_sightings controller)
+def index # animal_sightings = AnimalSighting.all # sightings = Sighting.where(date: params[:start_date]..params[:end_date])
+animal_sightings = AnimalSighting.where(date: params[:start_date]..params[:end_date])
+render json: animal_sightings
+end
+private
+def animal_sighting_params
+params.require(:animal_sighting).permit(:latitude, :longitude, :date, :animal_id)
+end
+(used params to help route)
+http://localhost:3000/animal_sightings/?start_date=2024-01-01&end_date=2024-12-31
+[
+{
+"id": 2,
+"latitude": "48843",
+"longitude": "39208",
+"date": "2024-12-14",
+"created_at": "2024-03-29T20:42:09.698Z",
+"updated_at": "2024-03-29T21:10:34.774Z",
+"animal_id": 2
+}
+]
+
 Stretch Challenges
 Story 4: In order to see the wildlife sightings contain valid data, as a user of the API, I need to include proper specs.
 
