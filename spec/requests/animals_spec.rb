@@ -1,5 +1,4 @@
 require 'rails_helper'
-
 RSpec.describe "Animals", type: :request do
     describe 'POST /animals' do
       context 'when the request is invalid' do
