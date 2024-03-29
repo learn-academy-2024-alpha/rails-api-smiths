@@ -68,7 +68,7 @@ end
 
 # }
 
-Can remove an animal entry in the database🐻
+Can remove an animal entry in the database🐻!
 def destroy
 animal = Animal.find(params[:id])
 animal.destroy
