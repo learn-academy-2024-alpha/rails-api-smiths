@@ -33,6 +33,6 @@ class AnimalsController < ApplicationController
 
   private
   def animal_params
-    params.require(:animal).permit(:common_name, :scientific_binomial)
+    params.require(:animal).permit(:common_name, :scientific_binomial, animal_sightings_attributes: [:latitude, :longitude, :date])
   end
 end

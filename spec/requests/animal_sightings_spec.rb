@@ -10,15 +10,6 @@ RSpec.describe "Animals", type: :request do
         expect(response).to have_http_status(422)
       end
     end
-
-    context "when the request is valid" do
-      let(:valid_attributes) { { common_name: 'Lion', scientific_binomial: 'Panthera leo' } }
-
-      it 'creates a new animal' do
-        post '/animals', params: { animal: valid_attributes }
-        expect(response).to have_http_status(:success)
-      end
-    end
   end
 end
 

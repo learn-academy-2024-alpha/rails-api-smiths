@@ -112,7 +112,7 @@ render json: animal, include: :animal_sightings
 end
 http://localhost:3000/animals/2
 Hint: Checkout this example on how to include associated records
-Can see all the animal sightings during a given time period
+Can see all the animal sightings during a given time period🐻
 Hint: Your controller can use a range to look like this:
 class SightingsController < ApplicationController
 def index
@@ -168,6 +168,60 @@ Can see a validation error if an animal's common name exactly matches the scient
 Can see a validation error if the animal's common name and scientific binomial are not unique
 Can see a status code of 422 when a post request can not be completed because of validation errors
 Hint: Handling Errors in an API Application the Rails Way
+(in animal_sightings_controller.rb)
+def update
+animal_sighting = AnimalSighting.find(params[:id])
+animal_sighting.update!(animal_sighting_attributes)
+animal_sighting.update(animal_sighting_params)
+render json: animal_sighting
+end
+(in animals_controller.rb)
+def create
+animal = Animal.new(animal_params)
+if animal.save
+render json: animal
+else
+render json: animal.errors, status: :unprocessable_entity
+end
+end
+def update
+animal = Animal.find(params[:id])
+animal.update!(animal_attributes)
+animal.update(animal_params)
+render json: animal
+end
+(in REQUESTS folder within specs folder: animal_spec.rb)
+require 'rails_helper'
+RSpec.describe "Animals", type: :request do
+describe 'POST /animals' do
+context 'when the request is invalid' do
+let(:invalid_attributes) { { common_name: nil, scientific_binomial: 'Test' } }
+
+        it 'returns status code 422' do
+          post '/animals', params: { animal: invalid_attributes }
+          expect(response).to have_http_status(422)
+        end
+      end
+    end
+
+end
+(in REQUESTS folder within specs folder: animal_sightings_spec.rb)
+require 'rails_helper'
+
+RSpec.describe "Animals", type: :request do
+describe "POST /animals" do
+context "when the request is invalid" do
+let(:invalid_attributes) { { common_name: nil, scientific_binomial: 'Test' } }
+
+      it 'returns status code 422' do
+        post '/animals', params: { animal: invalid_attributes }
+        expect(response).to have_http_status(422)
+      end
+    end
+
+end
+end
+
 Story 5: In order to increase efficiency, as a user of the API, I need to add an animal and a sighting at the same time.
 
 Branch: submit-animal-with-sightings
@@ -176,3 +230,27 @@ Acceptance Criteria
 
 Can create new animal along with sighting data in a single API request
 Hint: Look into accepts_nested_attributes_for
+(in animal.rb)
+class Animal < ApplicationRecord
+has_many :animal_sightings
+accepts_nested_attributes_for :animal_sightings
+end
+(in animals_controller.rb)
+def animal_params
+params.require(:animal).permit(:common_name, :scientific_binomial, animal_sightings_attributes: [:latitude, :longitude, :date])
+end
+(in post man)
+http://localhost:3000/animals
+{
+"animal": {
+"common_name": "brown panther",
+"scientific_binomial": "panther brown",
+"animal_sightings_attributes": [
+{
+"latitude": 12.345,
+"longitude": 67.890,
+"date": "2024-03-23"
+}
+]
+}
+}
